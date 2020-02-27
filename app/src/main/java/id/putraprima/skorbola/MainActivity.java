@@ -17,91 +17,100 @@ import android.widget.Toast;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int GALLERY_REQUEST_CODE = 1&2;
+
+    //image view
+    ImageView homeIconImage, awayIconImage;
+    EditText homeText, awayText;
+    //uri load gambar
+    Uri imageUriHome;
+    Uri imageUriAway;
+    //Bitmap
+    Bitmap bitmapHome;
+    Bitmap bitmapAway;
+    //TAG
     private static final String TAG = MainActivity.class.getCanonicalName();
-    public static final String HOMETEAM_KEY="home";
-    public static final String AWAYTEAM_KEY="away";
 
-
-    private EditText hometeam;
-    private EditText awayteam;
-    private  Bitmap bitmap1;
-    private  Bitmap bitmap2;
-    private ImageView homeImage;
-    private ImageView awayImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        hometeam = findViewById(R.id.home_team);
-        awayteam = findViewById(R.id.away_team);
-        homeImage = findViewById(R.id.home_logo);
-        awayImage = findViewById(R.id.away_logo);
+        //Find Id edit text
+        homeText = findViewById(R.id.home_team);
+        awayText = findViewById(R.id.away_team);
+        //Find id image view
+        homeIconImage = findViewById(R.id.home_logo);
+        awayIconImage = findViewById(R.id.away_logo);
 
-        //TODO
-        //Fitur Main Activity
-        //1. Validasi Input Home Team
-        //2. Validasi Input Away Team
-        //3. Ganti Logo Home Team
-        //4. Ganti Logo Away Team
-        //5. Next Button Pindah Ke MatchActivity
     }
 
-    public void NextPage(View view) {
-        String home = hometeam.getText().toString();
-        String away = awayteam.getText().toString();
+    //3. Ganti Logo Home Team
 
-        if(away.equals("")||home.equals("")){
-            Toast.makeText(this, "Data harus diisi", Toast.LENGTH_SHORT).show();
-        }
+    public void handleHomeLogo(View view) {
 
-        else{
-            Intent intent = new Intent(this, MatchActivity.class);
-            intent.putExtra(HOMETEAM_KEY, home);
-            intent.putExtra(AWAYTEAM_KEY, away);
-            startActivity(intent);
-        }
-    }
-    public void handleChangeAvatar(View view) {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 1);
     }
+    //4. Ganti Logo Away Team
 
-    public void handleChangeAvatar2(View view) {
+    public void handleAwayLogo(View view) {
+
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 2);
+
     }
+    //Load gallery atau kamera
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == 0) {
+        if (resultCode == RESULT_CANCELED){
             return;
         }
-        if (requestCode == 1) {
-            if (data != null) {
+        if (requestCode == 1){
+            if (data != null){
                 try {
-                    Uri imageUri = data.getData();
-                    bitmap1 = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    homeImage.setImageBitmap(bitmap1);
-                } catch (IOException e) {
-                    Toast.makeText(this, "Can't load image", Toast.LENGTH_SHORT).show();
+                    imageUriHome = data.getData();
+                    bitmapHome = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUriHome);
+                    homeIconImage.setImageBitmap(bitmapHome);
+                } catch (IOException e){
+                    Toast.makeText(this, "Tak bisa load gambar", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }else if (requestCode == 2){
+            if (data != null){
+                try {
+                    imageUriAway = data.getData();
+                    bitmapAway = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUriAway);
+                    awayIconImage.setImageBitmap(bitmapAway);
+                } catch (IOException e){
+                    Toast.makeText(this, "Tak bisa load gambar", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, e.getMessage());
                 }
             }
         }
-        if(requestCode==2){
-            if (data != null) {
-                try {
-                    Uri imageUri = data.getData();
-                    bitmap2 = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    awayImage.setImageBitmap(bitmap2);
-                } catch (IOException e) {
-                    Toast.makeText(this, "Can't load image", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, e.getMessage());
-                }
-            }
+    }
+
+    //5. Next Button Pindah Ke MatchActivity
+    public void handleNext(View view) {
+
+        //Input Edit Text
+        String inputHome = homeText.getText().toString();
+        String inputAway = awayText.getText().toString();
+        if (!inputHome.equals("") && !inputAway.equals("") && bitmapHome != null && bitmapAway != null){
+
+            Intent intent = new Intent(this, MatchActivity.class);
+            intent.putExtra("inputHome", inputHome);
+            intent.putExtra("inputAway", inputAway);
+            intent.putExtra("iconHome", imageUriHome.toString());
+            intent.putExtra("iconAway", imageUriAway.toString());
+            startActivity(intent);
+        }else{
+            Toast.makeText(this, "Isi seluruh data terlebih dahulu!", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 }
