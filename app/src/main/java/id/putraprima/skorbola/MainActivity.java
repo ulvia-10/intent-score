@@ -17,7 +17,6 @@ import android.widget.Toast;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-
     //image view
     ImageView homeIconImage, awayIconImage;
     EditText homeText, awayText;

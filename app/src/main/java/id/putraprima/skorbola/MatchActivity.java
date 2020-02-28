@@ -14,7 +14,6 @@ import android.widget.TextView;
 import java.io.IOException;
 
 public class MatchActivity extends AppCompatActivity {
-
     TextView homeName;
     TextView awayName;
 
@@ -120,6 +119,7 @@ public class MatchActivity extends AppCompatActivity {
         startActivity(intent);
 
     }
+
     }
     //TODO
         //1.Menampilkan detail match sesuai data dari main activity
